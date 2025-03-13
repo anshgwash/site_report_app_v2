@@ -6,10 +6,7 @@ import 'pdf_service.dart';
 import 'providers/form_provider.dart';
 
 void main() {
-  runApp(
-    // Wrap the entire app with ProviderScope to enable Riverpod
-    const ProviderScope(child: SiteReportApp()),
-  );
+  runApp(const ProviderScope(child: SiteReportApp()));
 }
 
 class SiteReportApp extends StatelessWidget {
@@ -55,12 +52,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Access the form data through Riverpod
     final formData = ref.watch(formStateProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('TF Site Report'),
+        toolbarHeight: 25,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -68,49 +65,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             Tab(icon: Icon(Icons.image), text: 'Images'),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.picture_as_pdf),
-            onPressed: () async {
-              // Show loading indicator
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Generating PDF...')),
-              );
-
-              try {
-                // Generate and share PDF using the form data from Riverpod
-                final pdfService = PdfService();
-                await pdfService.generateSiteReportPdf(formData);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('PDF generated successfully!')),
-                );
-              } catch (e) {
-                // Show error message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error generating PDF: $e')),
-                );
-              }
-            },
-          ),
-        ],
       ),
       body: TabBarView(
         controller: _tabController,
         children: [FormTab(formKey: formKey), ImagesTab()],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (_tabController.index == 0) {
-            if (formKey.currentState!.validate()) {
-              formKey.currentState!.save();
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('Form data saved')));
+        onPressed: () {},
+        child: PopupMenuButton<String>(
+          onSelected: (value) async {
+            if (value == 'save') {
+              if (_tabController.index == 0) {
+                if (formKey.currentState!.validate()) {
+                  formKey.currentState!.save();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Form data saved')),
+                  );
+                }
+              }
+            } else if (value == 'generate_pdf') {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Generating PDF...')),
+              );
+              try {
+                final pdfService = PdfService();
+                await pdfService.generateSiteReportPdf(formData);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('PDF generated successfully!')),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error generating PDF: $e')),
+                );
+              }
             }
-          }
-        },
-        child: const Icon(Icons.save),
+          },
+          itemBuilder:
+              (context) => [
+                const PopupMenuItem(
+                  value: 'save',
+                  child: ListTile(
+                    leading: Icon(Icons.save),
+                    title: Text('Save Form'),
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'generate_pdf',
+                  child: ListTile(
+                    leading: Icon(Icons.picture_as_pdf),
+                    title: Text('Generate PDF'),
+                  ),
+                ),
+              ],
+        ),
       ),
     );
   }
