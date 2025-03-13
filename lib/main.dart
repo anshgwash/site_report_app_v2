@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'form_tab.dart';
 import 'images_tab.dart';
 import 'pdf_service.dart';
+import 'providers/form_provider.dart';
 
 void main() {
-  runApp(const SiteReportApp());
+  runApp(
+    // Wrap the entire app with ProviderScope to enable Riverpod
+    const ProviderScope(child: SiteReportApp()),
+  );
 }
 
 class SiteReportApp extends StatelessWidget {
@@ -24,20 +29,17 @@ class SiteReportApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final formKey = GlobalKey<FormState>();
-
-  // Create a model to hold all form data
-  Map<String, dynamic> formData = {};
 
   @override
   void initState() {
@@ -53,6 +55,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Access the form data through Riverpod
+    final formData = ref.watch(formStateProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('TF Site Report'),
@@ -73,9 +78,13 @@ class _HomeScreenState extends State<HomeScreen>
               );
 
               try {
-                // Generate and share PDF
+                // Generate and share PDF using the form data from Riverpod
                 final pdfService = PdfService();
                 await pdfService.generateSiteReportPdf(formData);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('PDF generated successfully!')),
+                );
               } catch (e) {
                 // Show error message
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -88,25 +97,7 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          FormTab(
-            formKey: formKey,
-            formData: formData,
-            onFormDataChanged: (newData) {
-              setState(() {
-                formData = newData;
-              });
-            },
-          ),
-          ImagesTab(
-            formData: formData,
-            onImagesChanged: (newData) {
-              setState(() {
-                formData = newData;
-              });
-            },
-          ),
-        ],
+        children: [FormTab(formKey: formKey), ImagesTab()],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

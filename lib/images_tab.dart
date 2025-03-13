@@ -1,22 +1,17 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'providers/form_provider.dart';
 
-class ImagesTab extends StatefulWidget {
-  final Map<String, dynamic> formData;
-  final Function(Map<String, dynamic>) onImagesChanged;
-
-  const ImagesTab({
-    Key? key,
-    required this.formData,
-    required this.onImagesChanged,
-  }) : super(key: key);
+class ImagesTab extends ConsumerStatefulWidget {
+  const ImagesTab({Key? key}) : super(key: key);
 
   @override
-  _ImagesTabState createState() => _ImagesTabState();
+  ConsumerState<ImagesTab> createState() => _ImagesTabState();
 }
 
-class _ImagesTabState extends State<ImagesTab> {
+class _ImagesTabState extends ConsumerState<ImagesTab> {
   final ImagePicker _picker = ImagePicker();
 
   // Define the image categories
@@ -45,9 +40,7 @@ class _ImagesTabState extends State<ImagesTab> {
       );
 
       if (image != null) {
-        Map<String, dynamic> updatedData = Map.from(widget.formData);
-        updatedData[imageKey] = image.path;
-        widget.onImagesChanged(updatedData);
+        ref.read(formStateProvider.notifier).updateField(imageKey, image.path);
       }
     } catch (e) {
       ScaffoldMessenger.of(
@@ -66,9 +59,7 @@ class _ImagesTabState extends State<ImagesTab> {
       );
 
       if (image != null) {
-        Map<String, dynamic> updatedData = Map.from(widget.formData);
-        updatedData[imageKey] = image.path;
-        widget.onImagesChanged(updatedData);
+        ref.read(formStateProvider.notifier).updateField(imageKey, image.path);
       }
     } catch (e) {
       ScaffoldMessenger.of(
@@ -78,7 +69,9 @@ class _ImagesTabState extends State<ImagesTab> {
   }
 
   Widget _buildImageItem(String label, String imageKey) {
-    final imagePath = widget.formData[imageKey] as String?;
+    // Get the form data from Riverpod
+    final formData = ref.watch(formStateProvider);
+    final imagePath = formData[imageKey] as String?;
     final descriptionKey = '${imageKey}_description';
 
     return Card(
@@ -137,7 +130,7 @@ class _ImagesTabState extends State<ImagesTab> {
 
             // Description field
             TextFormField(
-              initialValue: widget.formData[descriptionKey] as String?,
+              initialValue: formData[descriptionKey] as String?,
               decoration: const InputDecoration(
                 labelText: 'Description (optional)',
                 border: OutlineInputBorder(),
@@ -147,9 +140,9 @@ class _ImagesTabState extends State<ImagesTab> {
               minLines: 2,
               maxLines: 4,
               onChanged: (value) {
-                Map<String, dynamic> updatedData = Map.from(widget.formData);
-                updatedData[descriptionKey] = value;
-                widget.onImagesChanged(updatedData);
+                ref
+                    .read(formStateProvider.notifier)
+                    .updateField(descriptionKey, value);
               },
             ),
           ],
