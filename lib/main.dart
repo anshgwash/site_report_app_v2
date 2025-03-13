@@ -16,10 +16,7 @@ class SiteReportApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Site Report App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: ThemeData(visualDensity: VisualDensity.adaptivePlatformDensity),
       home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );

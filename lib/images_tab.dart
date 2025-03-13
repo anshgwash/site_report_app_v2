@@ -38,7 +38,6 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
         maxHeight: 1800,
         imageQuality: 85,
       );
-
       if (image != null) {
         ref.read(formStateProvider.notifier).updateField(imageKey, image.path);
       }
@@ -57,7 +56,6 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
         maxHeight: 1800,
         imageQuality: 85,
       );
-
       if (image != null) {
         ref.read(formStateProvider.notifier).updateField(imageKey, image.path);
       }
@@ -75,15 +73,20 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
     final descriptionKey = '${imageKey}_description';
 
     return Card(
+      elevation: 2.0,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Title
             Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
 
@@ -93,7 +96,7 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.grey[200],
-                border: Border.all(color: Colors.grey),
+                border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(8),
               ),
               child:
@@ -102,7 +105,12 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
                         borderRadius: BorderRadius.circular(8),
                         child: Image.file(File(imagePath), fit: BoxFit.cover),
                       )
-                      : const Center(child: Text('No image selected')),
+                      : Center(
+                        child: Text(
+                          'No image selected',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      ),
             ),
             const SizedBox(height: 12),
 
@@ -114,15 +122,11 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
                   onPressed: () => _captureImage(imageKey),
                   icon: const Icon(Icons.camera_alt),
                   label: const Text('Camera'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                 ),
                 ElevatedButton.icon(
                   onPressed: () => _pickImage(imageKey),
                   icon: const Icon(Icons.photo_library),
                   label: const Text('Gallery'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
                 ),
               ],
             ),
@@ -131,9 +135,11 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
             // Description field
             TextFormField(
               initialValue: formData[descriptionKey] as String?,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Description (optional)',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
                 hintText: 'Add a short description',
               ),
               maxLength: 200,
@@ -160,9 +166,12 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Elevation Images
-            const Text(
+            Text(
               'Elevation Images',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             ...elevationImages.map(
@@ -171,9 +180,12 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
             const SizedBox(height: 20),
 
             // Other Images
-            const Text(
+            Text(
               'Other Images',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             ...otherImages.map(
