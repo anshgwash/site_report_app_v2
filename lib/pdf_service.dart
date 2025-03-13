@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -8,14 +7,17 @@ import 'package:share_plus/share_plus.dart';
 import 'package:cross_file/cross_file.dart';
 
 class PdfService {
-  Future<void> generateSiteReportPdf(
-    Map<String, dynamic> formData, [
-    Map<String, dynamic>? imageData,
-  ]) async {
-    // Initialize imageData if not provided
-    final Map<String, dynamic> safeImageData = imageData ?? {};
-
+  Future<void> generateSiteReportPdf(Map<String, dynamic> formData) async {
     final pdf = pw.Document();
+
+    // Debug what images we have available
+    print('Image keys in formData:');
+    formData.keys
+        .where(
+          (key) =>
+              key.startsWith('elevation_') || key.startsWith('other_image_'),
+        )
+        .forEach((key) => print('$key: ${formData[key]}'));
 
     // Image handling
     List<pw.ImageProvider?> imagesList = List.filled(10, null);
@@ -24,79 +26,69 @@ class PdfService {
     // Logo image
     pw.ImageProvider? logoImage;
     try {
-      final logoBytes = await rootBundle.load('assets/logo.png');
+      final logoBytes = await rootBundle.load('logo.png');
       logoImage = pw.MemoryImage(logoBytes.buffer.asUint8List());
     } catch (e) {
       print('Logo image not found: $e');
     }
 
-    // Load elevation images
-    for (var i = 1; i <= 4; i++) {
-      print('Checking elev$i: ${safeImageData['elev$i']}');
-      if (safeImageData['elev$i'] != null &&
-          safeImageData['elev$i'].toString().isNotEmpty) {
-        print('Elevation $i image is not empty');
-        try {
-          String imgFiles = safeImageData['elev$i'].toString();
-          // Check if additional parsing is needed
-          String filePath = imgFiles;
-          if (imgFiles.contains('[') && imgFiles.contains(']')) {
-            // Handle parsing similar to original code if needed
-            filePath = imgFiles.substring(
-              imgFiles.indexOf('[') + 1,
-              imgFiles.lastIndexOf(']'),
-            );
-          }
+    // Mapping for elevation images
+    final Map<String, int> elevationIndices = {
+      'elevation_front': 0,
+      'elevation_rear': 1,
+      'elevation_side1': 2,
+      'elevation_side2': 3,
+    };
 
-          print('Loading elevation image from: $filePath');
+    // Load elevation images
+    elevationIndices.forEach((key, index) {
+      if (formData.containsKey(key) &&
+          formData[key] != null &&
+          formData[key].toString().isNotEmpty) {
+        try {
+          String filePath = formData[key];
+          print('Loading elevation image for $key from: $filePath');
+
           final file = File(filePath);
           if (file.existsSync()) {
             final bytes = file.readAsBytesSync();
-            elevImages[i - 1] = pw.MemoryImage(bytes);
-            print('Successfully loaded elevation $i image');
+            elevImages[index] = pw.MemoryImage(bytes);
+            print('✅ Successfully loaded image for $key');
           } else {
-            print('File not found: $filePath');
+            print('❌ File not found for $key: $filePath');
           }
         } catch (e) {
-          print('Error loading elevation image $i: $e');
+          print('❌ Error loading elevation image for $key: $e');
         }
       } else {
-        print('No image path found for elev$i');
+        print('ℹ️ No image path found for $key');
       }
-    }
+    });
 
     // Load other images
     for (var i = 1; i <= 10; i++) {
-      print('Checking img$i: ${safeImageData['img$i']}');
-      if (safeImageData['img$i'] != null &&
-          safeImageData['img$i'].toString().isNotEmpty) {
-        print('Image $i is not empty');
-        try {
-          String imgFiles = safeImageData['img$i'].toString();
-          // Check if additional parsing is needed
-          String filePath = imgFiles;
-          if (imgFiles.contains('[') && imgFiles.contains(']')) {
-            // Handle parsing similar to original code if needed
-            filePath = imgFiles.substring(
-              imgFiles.indexOf('[') + 1,
-              imgFiles.lastIndexOf(']'),
-            );
-          }
+      final imageKey = 'other_image_$i';
 
-          print('Loading image from: $filePath');
+      if (formData.containsKey(imageKey) &&
+          formData[imageKey] != null &&
+          formData[imageKey].toString().isNotEmpty) {
+        try {
+          String filePath = formData[imageKey];
+          print('Loading image for $imageKey from: $filePath');
+
           final file = File(filePath);
           if (file.existsSync()) {
             final bytes = file.readAsBytesSync();
             imagesList[i - 1] = pw.MemoryImage(bytes);
-            print('Successfully loaded image $i');
+            print('✅ Successfully loaded image $i for $imageKey');
           } else {
-            print('File not found: $filePath');
+            print('❌ File not found for $imageKey: $filePath');
           }
         } catch (e) {
-          print('Error loading image $i: $e');
+          print('❌ Error loading image for $imageKey: $e');
         }
       } else {
-        print('No image path found for img$i');
+        print('ℹ️ No image path found for $imageKey');
       }
     }
 
@@ -234,16 +226,45 @@ class PdfService {
 
             pw.SizedBox(height: 5),
 
-            // Elevation images
-            _buildElevationImage(0, elevImages, safeImageData, 'Front'),
-            _buildElevationImage(1, elevImages, safeImageData, 'Rear'),
-            _buildElevationImage(2, elevImages, safeImageData, 'Side 1'),
-            _buildElevationImage(3, elevImages, safeImageData, 'Side 2'),
+            // Elevation images with their descriptions
+            _buildElevationImage(
+              0,
+              elevImages,
+              formData,
+              'Front Elevation',
+              'elevation_front',
+            ),
+            _buildElevationImage(
+              1,
+              elevImages,
+              formData,
+              'Rear Elevation',
+              'elevation_rear',
+            ),
+            _buildElevationImage(
+              2,
+              elevImages,
+              formData,
+              'Side 1 Elevation',
+              'elevation_side1',
+            ),
+            _buildElevationImage(
+              3,
+              elevImages,
+              formData,
+              'Side 2 Elevation',
+              'elevation_side2',
+            ),
 
-            // Other images
+            // Other images with their descriptions
             ...List.generate(
               10,
-              (i) => _buildOtherImage(i, imagesList, safeImageData),
+              (i) => _buildOtherImage(
+                i,
+                imagesList,
+                formData,
+                'other_image_${i + 1}',
+              ),
             ),
           ];
         },
@@ -259,9 +280,9 @@ class PdfService {
       final file = File('${output.path}/$fileName');
 
       await file.writeAsBytes(await pdf.save());
-      print('PDF saved at: ${file.path}');
+      print('📄 PDF saved at: ${file.path}');
 
-      // Share the PDF using the confirmed working method
+      // Share the PDF
       try {
         XFile fileXFile = XFile(file.path);
         await Share.shareXFiles([fileXFile], text: 'Site Report PDF');
@@ -518,11 +539,12 @@ class PdfService {
   pw.Widget _buildElevationImage(
     int index,
     List<pw.ImageProvider?> elevImages,
-    Map<String, dynamic> imageData,
+    Map<String, dynamic> formData,
     String text,
+    String uiKey,
   ) {
-    final descKey =
-        'elev${index + 1}-Remark'; // Changed to match original format
+    final descriptionKey = '${uiKey}_description';
+    final description = formData[descriptionKey] as String? ?? '';
 
     if (elevImages[index] != null) {
       return pw.Column(
@@ -530,15 +552,12 @@ class PdfService {
         children: [
           pw.Image(elevImages[index]!, height: 600, fit: pw.BoxFit.contain),
           pw.SizedBox(height: 2),
-          pw.Text(
-            '$text: ${imageData[descKey] ?? ''}',
-            style: pw.TextStyle(fontSize: 16),
-          ),
+          pw.Text('$text: $description', style: pw.TextStyle(fontSize: 16)),
           pw.SizedBox(height: 10),
         ],
       );
     } else {
-      return pw.SizedBox(height: 0.1);
+      return pw.SizedBox(height: 0.1); // Return empty space if no image
     }
   }
 
@@ -546,10 +565,11 @@ class PdfService {
   pw.Widget _buildOtherImage(
     int index,
     List<pw.ImageProvider?> imagesList,
-    Map<String, dynamic> imageData,
+    Map<String, dynamic> formData,
+    String uiKey,
   ) {
-    final descKey =
-        'img${index + 1}-Remark'; // Changed to match original format
+    final descriptionKey = '${uiKey}_description';
+    final description = formData[descriptionKey] as String? ?? '';
 
     if (imagesList[index] != null) {
       return pw.Column(
@@ -559,14 +579,14 @@ class PdfService {
           pw.Image(imagesList[index]!, fit: pw.BoxFit.contain, height: 250),
           pw.SizedBox(height: 2),
           pw.Text(
-            'Image ${index + 1}: ${imageData[descKey] ?? ''}',
+            'Image ${index + 1}: $description',
             style: pw.TextStyle(fontSize: 12),
           ),
           pw.SizedBox(height: 2),
         ],
       );
     } else {
-      return pw.SizedBox(height: 0.1);
+      return pw.SizedBox(height: 0.1); // Return empty space if no image
     }
   }
 }
