@@ -65,6 +65,13 @@ class SectionTwo extends StatelessWidget {
           icon: Icons.person,
           fieldKey: 'representingClient',
         ),
+
+        const SizedBox(height: 16),
+        _buildAttendeeField(
+          label: 'Representing PMC',
+          icon: Icons.person,
+          fieldKey: 'representingPmc',
+        ),
       ],
     );
   }

@@ -19,6 +19,7 @@ class SectionOne extends StatefulWidget {
 class _SectionOneState extends State<SectionOne> {
   // Choice chip options
   final List<String> _checkTypes = [
+    'General',
     'Centerline',
     'Plinth',
     'Slab',

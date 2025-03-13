@@ -201,6 +201,10 @@ class PdfService {
                   'Contractor',
                   '${formData['representingContractor'] ?? 'N/A'}',
                 ],
+                <String>[
+                  'Contractor',
+                  '${formData['representingPmc'] ?? 'N/A'}',
+                ],
               ],
             ),
 
