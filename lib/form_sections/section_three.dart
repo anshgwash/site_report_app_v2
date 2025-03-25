@@ -132,10 +132,6 @@ class _SectionThreeState extends State<SectionThree> {
                   title: 'Mid Landing Level',
                   fieldName: 'mid_landing_level',
                 ),
-                _buildYesNoField(
-                  title: 'Hand Railing Details',
-                  fieldName: 'hand_railing',
-                ),
               ],
             ),
 
