@@ -7,7 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:cross_file/cross_file.dart';
 
 class PdfService {
-  Future<void> generateSiteReportPdf(Map<String, dynamic> formData) async {
+  Future<String> generateSiteReportPdf(Map<String, dynamic> formData) async {
     final pdf = pw.Document();
 
     // ... (existing code remains the same)
@@ -46,14 +46,18 @@ class PdfService {
       ),
     );
 
-    // ... (saving and sharing code)
+    final directory = await getApplicationDocumentsDirectory();
+    final path = '${directory.path}/site_report.pdf';
+    final file = File(path);
+    await file.writeAsBytes(await pdf.save());
+    return path;
   }
 
   // UPDATED HELPER METHOD
   // TODO: change font so that emoji works in PDF
   String _getYesNo(dynamic value) {
-    if (value == 'Yes') return '✅';
-    if (value == 'No') return '❌';
+    if (value == 'Yes') return '✓';
+    if (value == 'No') return 'x';
     return '-'; // or any icon you prefer for "N/A"
   }
 

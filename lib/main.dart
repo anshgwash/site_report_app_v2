@@ -4,6 +4,7 @@ import 'form_tab.dart';
 import 'images_tab.dart';
 import 'pdf_service.dart';
 import 'providers/form_provider.dart';
+import 'package:open_file/open_file.dart';
 
 void main() {
   runApp(const ProviderScope(child: SiteReportApp()));
@@ -86,10 +87,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               );
               try {
                 final pdfService = PdfService();
-                await pdfService.generateSiteReportPdf(formData);
+                final filePath = await pdfService.generateSiteReportPdf(
+                  formData,
+                );
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('PDF generated successfully!')),
                 );
+                await OpenFile.open(filePath);
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Error generating PDF: $e')),
