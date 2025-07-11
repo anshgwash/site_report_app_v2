@@ -87,13 +87,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               );
               try {
                 final pdfService = PdfService();
-                final filePath = await pdfService.generateSiteReportPdf(
-                  formData,
-                );
+                await pdfService.generateSiteReportPdf(formData);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('PDF generated successfully!')),
                 );
-                await OpenFile.open(filePath);
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Error generating PDF: $e')),

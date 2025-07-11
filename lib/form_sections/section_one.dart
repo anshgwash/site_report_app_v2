@@ -67,7 +67,7 @@ class _SectionOneState extends State<SectionOne> {
             _buildSiteReportNumberField(),
             const SizedBox(height: 16),
 
-            _buildReportByChips(),
+            // _buildReportByChips(),
           ],
         ),
       ),
@@ -249,30 +249,30 @@ class _SectionOneState extends State<SectionOne> {
     );
   }
 
-  Widget _buildReportByChips() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Report By:'),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children:
-              _reportByOptions.map((person) {
-                return ChoiceChip(
-                  label: Text(person),
-                  selected: _selectedReportBy == person,
-                  selectedColor: Colors.blue.shade100,
-                  onSelected: (selected) {
-                    setState(() {
-                      _selectedReportBy = selected ? person : null;
-                      widget.updateFormData('reportBy', _selectedReportBy);
-                    });
-                  },
-                );
-              }).toList(),
-        ),
-      ],
-    );
-  }
+  // Widget _buildReportByChips() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       const Text('Report By:'),
+  //       const SizedBox(height: 8),
+  //       Wrap(
+  //         spacing: 8,
+  //         children:
+  //             _reportByOptions.map((person) {
+  //               return ChoiceChip(
+  //                 label: Text(person),
+  //                 selected: _selectedReportBy == person,
+  //                 selectedColor: Colors.blue.shade100,
+  //                 onSelected: (selected) {
+  //                   setState(() {
+  //                     _selectedReportBy = selected ? person : null;
+  //                     widget.updateFormData('reportBy', _selectedReportBy);
+  //                   });
+  //                 },
+  //               );
+  //             }).toList(),
+  //       ),
+  //     ],
+  //   );
+  // }
 }
