@@ -98,8 +98,8 @@ class PdfService {
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
                   pw.Text(
-                    '${formData['projectName'] ?? 'Project'} - (Site Report #${formData['siteReportNo'] ?? 'N/A'})',
-                    style: pw.TextStyle(fontSize: 25),
+                    '${formData['projectName'] ?? 'Project'}',
+                    style: pw.TextStyle(fontSize: 20),
                   ),
                   logoImage != null
                       ? pw.Image(
@@ -112,64 +112,37 @@ class PdfService {
                 ],
               ),
             ),
-            pw.Row(
-              children: [
-                pw.Expanded(
-                  child: pw.Table.fromTextArray(
-                    context: context,
-                    data: <List<String>>[
-                      <String>['Category', 'Value'],
-                      <String>[
-                        'Subject:',
-                        '${formData['typeOfCheck'] ?? 'N/A'}',
-                      ],
-                      <String>[
-                        'Arch Dwg No.:',
-                        '${formData['architecturalDwgNo'] ?? 'N/A'}',
-                      ],
-                      <String>[
-                        'Structural Dwg No.:',
-                        '${formData['structuralDwgNo'] ?? 'N/A'}',
-                      ],
-                      <String>[
-                        'Section Dwg No.:',
-                        '${formData['sectionDwgNo'] ?? 'N/A'}',
-                      ],
-                      <String>[
-                        'Elevation Dwg No.:',
-                        '${formData['elevationDwgNo'] ?? 'N/A'}',
-                      ],
-                    ],
-                  ),
-                ),
-                pw.Expanded(
-                  child: pw.Table.fromTextArray(
-                    context: context,
-                    data: <List<String>>[
-                      <String>['Category', 'Value'],
-                      <String>[
-                        'Slab Level:',
-                        '${formData['slabLevel'] ?? 'N/A'}',
-                      ],
-                      <String>[
-                        'Date:',
-                        '${DateTime.now().toString().split(' ')[0]}',
-                      ],
-                      <String>[
-                        'Time:',
-                        '${DateTime.now().toString().split(' ')[1].substring(0, 5)}',
-                      ],
-                      <String>[
-                        'Site Report No.:',
-                        '${formData['siteReportNo'] ?? 'N/A'}',
-                      ],
-                      <String>[
-                        'Site Report By:',
-                        '${formData['reportBy'] ?? 'N/A'}',
-                      ],
-                    ],
-                  ),
-                ),
+            pw.Table.fromTextArray(
+              context: context,
+              data: <List<String>>[
+                <String>['Category', 'Value'],
+                <String>['Subject:', '${formData['typeOfCheck'] ?? 'N/A'}'],
+                <String>[
+                  'Arch Dwg No.:',
+                  '${formData['architecturalDwgNo'] ?? 'N/A'}',
+                ],
+                <String>[
+                  'Structural Dwg No.:',
+                  '${formData['structuralDwgNo'] ?? 'N/A'}',
+                ],
+                <String>[
+                  'Section Dwg No.:',
+                  '${formData['sectionDwgNo'] ?? 'N/A'}',
+                ],
+                <String>[
+                  'Elevation Dwg No.:',
+                  '${formData['elevationDwgNo'] ?? 'N/A'}',
+                ],
+                <String>['Slab Level:', '${formData['slabLevel'] ?? 'N/A'}'],
+                <String>['Date:', '${DateTime.now().toString().split(' ')[0]}'],
+                <String>[
+                  'Time:',
+                  '${DateTime.now().toString().split(' ')[1].substring(0, 5)}',
+                ],
+                <String>[
+                  'Site Report No.:',
+                  '${formData['siteReportNo'] ?? 'N/A'}',
+                ],
               ],
             ),
             pw.SizedBox(height: 10),

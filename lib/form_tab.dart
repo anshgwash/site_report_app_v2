@@ -14,6 +14,12 @@ class FormTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Get form data from provider
     final formData = ref.watch(formStateProvider);
+    final formVersion = ref.watch(formVersionProvider);
+
+    // Show a loader while data is loading
+    if (formData == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     // Function to update form data
     void updateFormData(String key, dynamic value) {
@@ -24,6 +30,9 @@ class FormTab extends ConsumerWidget {
       body: Form(
         key: formKey,
         child: SingleChildScrollView(
+          key: ValueKey(
+            formVersion,
+          ), // This will force rebuild when form is cleared
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

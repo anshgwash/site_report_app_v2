@@ -66,9 +66,12 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
     }
   }
 
-  Widget _buildImageItem(String label, String imageKey) {
+  Widget _buildImageItem(
+    Map<String, dynamic> formData,
+    String label,
+    String imageKey,
+  ) {
     // Get the form data from Riverpod
-    final formData = ref.watch(formStateProvider);
     final imagePath = formData[imageKey] as String?;
     final descriptionKey = '${imageKey}_description';
 
@@ -159,6 +162,11 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
 
   @override
   Widget build(BuildContext context) {
+    final formData = ref.watch(formStateProvider);
+
+    if (formData == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -175,7 +183,8 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
             ),
             const SizedBox(height: 8),
             ...elevationImages.map(
-              (image) => _buildImageItem(image['label'], image['key']),
+              (image) =>
+                  _buildImageItem(formData, image['label'], image['key']),
             ),
             const SizedBox(height: 20),
 
@@ -189,7 +198,8 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
             ),
             const SizedBox(height: 8),
             ...otherImages.map(
-              (image) => _buildImageItem(image['label'], image['key']),
+              (image) =>
+                  _buildImageItem(formData, image['label'], image['key']),
             ),
           ],
         ),

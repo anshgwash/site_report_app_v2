@@ -4,19 +4,32 @@ import 'dart:convert';
 
 // Define the provider that will be used throughout the app
 final formStateProvider =
-    StateNotifierProvider<FormStateNotifier, Map<String, dynamic>>(
+    StateNotifierProvider<FormStateNotifier, Map<String, dynamic>?>(
       (ref) => FormStateNotifier(),
     );
 
-class FormStateNotifier extends StateNotifier<Map<String, dynamic>> {
-  FormStateNotifier() : super({}) {
+// Provider for form version to force rebuilds when form is cleared
+final formVersionProvider = StateNotifierProvider<FormVersionNotifier, int>(
+  (ref) => FormVersionNotifier(),
+);
+
+class FormVersionNotifier extends StateNotifier<int> {
+  FormVersionNotifier() : super(0);
+
+  void increment() {
+    state = state + 1;
+  }
+}
+
+class FormStateNotifier extends StateNotifier<Map<String, dynamic>?> {
+  FormStateNotifier() : super(null) {
     _loadFormState(); // Load data when initialized
   }
 
   /// Update a field
   void updateField(String key, dynamic value) {
     // Create a new map to avoid modifying the existing state directly
-    final updatedState = Map<String, dynamic>.from(state);
+    final updatedState = Map<String, dynamic>.from(state!);
     updatedState[key] = value; // Set the new value for the given key
     state = updatedState; // Update the state
     _saveFormState(); // Save to persistent storage
@@ -24,7 +37,7 @@ class FormStateNotifier extends StateNotifier<Map<String, dynamic>> {
 
   /// Update multiple fields at once
   void updateFields(Map<String, dynamic> fields) {
-    final updatedState = Map<String, dynamic>.from(state);
+    final updatedState = Map<String, dynamic>.from(state!);
     updatedState.addAll(fields); // Add all the new fields
     state = updatedState;
     _saveFormState();
@@ -37,19 +50,23 @@ class FormStateNotifier extends StateNotifier<Map<String, dynamic>> {
       final savedData = prefs.getString('formState');
       if (savedData != null) {
         state = Map<String, dynamic>.from(jsonDecode(savedData));
-        print('Loaded form state: ${state.length} fields');
+      } else {
+        state = {}; // Initialize with an empty map if no data is saved
       }
+      print('Loaded form state: ${state?.length ?? 0} fields');
     } catch (e) {
       print('Error loading form state: $e');
+      state = {}; // Initialize on error to prevent the app from getting stuck
     }
   }
 
   /// Save the current form state to SharedPreferences
   Future<void> _saveFormState() async {
+    if (state == null) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('formState', jsonEncode(state));
-      print('Saved form state: ${state.length} fields');
+      print('Saved form state: ${state!.length} fields');
     } catch (e) {
       print('Error saving form state: $e');
     }

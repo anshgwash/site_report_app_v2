@@ -81,6 +81,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 }
               }
             } else if (value == 'generate_pdf') {
+              // Ensure formData is not null before using it
+              if (formData == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Form data is not loaded yet.')),
+                );
+                return;
+              }
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Generating PDF...')),
               );
@@ -93,6 +100,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Error generating PDF: $e')),
+                );
+              }
+            } else if (value == 'clear_form') {
+              // Show confirmation dialog
+              final shouldClear = await showDialog<bool>(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Clear Form'),
+                    content: const Text(
+                      'Are you sure you want to clear all form data? This action cannot be undone.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
+                        child: const Text('Clear'),
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (shouldClear == true) {
+                ref.read(formStateProvider.notifier).clearForm();
+                ref.read(formVersionProvider.notifier).increment();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Form data cleared')),
                 );
               }
             }
@@ -111,6 +152,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   child: ListTile(
                     leading: Icon(Icons.picture_as_pdf),
                     title: Text('Generate PDF'),
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'clear_form',
+                  child: ListTile(
+                    leading: Icon(Icons.clear_all, color: Colors.red),
+                    title: Text(
+                      'Clear Form',
+                      style: TextStyle(color: Colors.red),
+                    ),
                   ),
                 ),
               ],
