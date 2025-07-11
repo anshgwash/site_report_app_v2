@@ -29,6 +29,9 @@ class _SectionThreeState extends State<SectionThree> {
     'elevation': true,
   };
 
+  // Expanded remark trackers
+  final Map<String, bool> _expandedRemarks = {};
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -67,12 +70,10 @@ class _SectionThreeState extends State<SectionThree> {
                 _buildYesNoField(
                   title: 'UG tanks top slab level marking',
                   fieldName: 'ug_tanks_level',
-                  hasRemarks: true,
                 ),
                 _buildYesNoField(
                   title: 'Site levels marking w.r.t road level',
                   fieldName: 'site_levels_road',
-                  hasRemarks: true,
                 ),
               ],
             ),
@@ -85,12 +86,10 @@ class _SectionThreeState extends State<SectionThree> {
                 _buildYesNoField(
                   title: 'Open offset dimension',
                   fieldName: 'offset_dimension',
-                  hasRemarks: true,
                 ),
                 _buildYesNoField(
                   title: 'Column marking as per center line',
                   fieldName: 'column_marking',
-                  hasRemarks: true,
                 ),
               ],
             ),
@@ -103,7 +102,6 @@ class _SectionThreeState extends State<SectionThree> {
                 _buildYesNoField(
                   title: 'Overall checking - supporting level, no gaps, etc.',
                   fieldName: 'shuttering_check',
-                  hasRemarks: true,
                 ),
               ],
             ),
@@ -238,11 +236,12 @@ class _SectionThreeState extends State<SectionThree> {
     );
   }
 
-  Widget _buildYesNoField({
-    required String title,
-    required String fieldName,
-    bool hasRemarks = false,
-  }) {
+  Widget _buildYesNoField({required String title, required String fieldName}) {
+    final hasRemark =
+        widget.formData['${fieldName}_remarks'] != null &&
+        widget.formData['${fieldName}_remarks'].toString().isNotEmpty;
+    final isRemarkExpanded = _expandedRemarks[fieldName] ?? false;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -251,31 +250,71 @@ class _SectionThreeState extends State<SectionThree> {
           Text(title),
           Row(
             children: [
-              Radio<String>(
-                value: 'Yes',
-                groupValue: widget.formData['${fieldName}_yn'] as String?,
-                onChanged: (value) {
+              // Radio buttons for Yes/No/N/A
+              Expanded(
+                child: Row(
+                  children: [
+                    Radio<String>(
+                      value: 'Yes',
+                      groupValue: widget.formData['${fieldName}_yn'] as String?,
+                      onChanged: (value) {
+                        setState(() {
+                          widget.updateFormData('${fieldName}_yn', value);
+                        });
+                      },
+                    ),
+                    const Text('Yes'),
+                    const SizedBox(width: 16),
+                    Radio<String>(
+                      value: 'No',
+                      groupValue: widget.formData['${fieldName}_yn'] as String?,
+                      onChanged: (value) {
+                        setState(() {
+                          widget.updateFormData('${fieldName}_yn', value);
+                        });
+                      },
+                    ),
+                    const Text('No'),
+                    const SizedBox(width: 16),
+                    Radio<String>(
+                      value: 'N/A',
+                      groupValue: widget.formData['${fieldName}_yn'] as String?,
+                      onChanged: (value) {
+                        setState(() {
+                          widget.updateFormData('${fieldName}_yn', value);
+                        });
+                      },
+                    ),
+                    const Text('N/A'),
+                  ],
+                ),
+              ),
+              // Add Remark button
+              IconButton(
+                onPressed: () {
                   setState(() {
-                    widget.updateFormData('${fieldName}_yn', value);
+                    _expandedRemarks[fieldName] = !isRemarkExpanded;
                   });
                 },
+                icon: Icon(
+                  isRemarkExpanded ? Icons.remove : Icons.add,
+                  color: hasRemark ? Colors.orange : Colors.blue,
+                  size: 20,
+                ),
+                tooltip: isRemarkExpanded ? 'Hide Remark' : 'Add Remark',
+                style: IconButton.styleFrom(
+                  backgroundColor:
+                      hasRemark ? Colors.orange.shade50 : Colors.blue.shade50,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
-              const Text('Yes'),
-              const SizedBox(width: 16),
-              Radio<String>(
-                value: 'No',
-                groupValue: widget.formData['${fieldName}_yn'] as String?,
-                onChanged: (value) {
-                  setState(() {
-                    widget.updateFormData('${fieldName}_yn', value);
-                  });
-                },
-              ),
-              const Text('No'),
             ],
           ),
-          if (hasRemarks) ...[
-            const SizedBox(height: 4),
+          // Show remark field if expanded
+          if (isRemarkExpanded) ...[
+            const SizedBox(height: 8),
             TextFormField(
               initialValue: widget.formData['${fieldName}_remarks'] as String?,
               decoration: const InputDecoration(
@@ -285,10 +324,41 @@ class _SectionThreeState extends State<SectionThree> {
                   horizontal: 12,
                   vertical: 10,
                 ),
+                hintText: 'Enter your remarks here...',
               ),
+              maxLines: 3,
+              maxLength: 240,
               onChanged: (value) {
                 widget.updateFormData('${fieldName}_remarks', value);
               },
+            ),
+          ],
+          // Show existing remark if not expanded but has content
+          if (!isRemarkExpanded && hasRemark) ...[
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: Colors.orange.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.note, size: 16, color: Colors.orange.shade700),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.formData['${fieldName}_remarks'].toString(),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange.shade700,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
           const SizedBox(height: 8),

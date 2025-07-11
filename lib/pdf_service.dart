@@ -274,8 +274,9 @@ class PdfService {
   }
 
   String _getYesNo(dynamic value) {
-    if (value == 'Yes') return '✓';
-    if (value == 'No') return 'x';
+    if (value == 'Yes') return 'Y';
+    if (value == 'No') return 'N';
+    if (value == 'N/A') return 'NA';
     return '-';
   }
 
@@ -290,7 +291,7 @@ class PdfService {
         'A',
         'No superseded drawings on site/correct drawings being referred',
         _getYesNo(formData['correct_drawing_yn']),
-        '',
+        '${formData['correct_drawing_remarks'] ?? ''}',
       ],
       <String>[''],
 
@@ -300,7 +301,7 @@ class PdfService {
         'A',
         'North of site as per demarcation',
         _getYesNo(formData['north_site_demarcation_yn']),
-        '',
+        '${formData['north_site_demarcation_remarks'] ?? ''}',
       ],
       <String>[
         'B',
@@ -354,104 +355,109 @@ class PdfService {
         'B',
         'Cutout for Lift Dimension',
         _getYesNo(formData['slab_item_0_yn']),
-        '',
+        '${formData['slab_item_0_remarks'] ?? ''}',
       ],
       <String>[
         'C',
         'Cutout for Plumbing Shaft',
         _getYesNo(formData['slab_item_1_yn']),
-        '',
+        '${formData['slab_item_1_remarks'] ?? ''}',
       ],
       <String>[
         'D',
         'Cutout for Electrical',
         _getYesNo(formData['slab_item_2_yn']),
-        '',
+        '${formData['slab_item_2_remarks'] ?? ''}',
       ],
       <String>[
         'E',
         'Flower Bed Sunk',
         _getYesNo(formData['slab_item_3_yn']),
-        '',
+        '${formData['slab_item_3_remarks'] ?? ''}',
       ],
-      <String>['F', 'Toilet Sunk', _getYesNo(formData['slab_item_4_yn']), ''],
+      <String>[
+        'F',
+        'Toilet Sunk',
+        _getYesNo(formData['slab_item_4_yn']),
+        '${formData['slab_item_4_remarks'] ?? ''}',
+      ],
       <String>[
         'G',
         'Terrace/Balcony Sunk',
         _getYesNo(formData['slab_item_5_yn']),
-        '',
+        '${formData['slab_item_5_remarks'] ?? ''}',
       ],
       <String>[
         'H',
         'Terrace Projection',
         _getYesNo(formData['slab_item_6_yn']),
-        '',
+        '${formData['slab_item_6_remarks'] ?? ''}',
       ],
       <String>[
         'I',
         'Basements checking',
         _getYesNo(formData['slab_item_7_yn']),
-        '',
+        '${formData['slab_item_7_remarks'] ?? ''}',
       ],
       <String>[
         'J',
         'Size of Column',
         _getYesNo(formData['slab_item_8_yn']),
-        '',
+        '${formData['slab_item_8_remarks'] ?? ''}',
       ],
       <String>[
         'K',
         'Alignment of Column',
         _getYesNo(formData['slab_item_9_yn']),
-        '',
+        '${formData['slab_item_9_remarks'] ?? ''}',
       ],
       <String>[
         'L',
         'Reduction of Column',
         _getYesNo(formData['slab_item_10_yn']),
-        '',
+        '${formData['slab_item_10_remarks'] ?? ''}',
       ],
       <String>[
         'M',
         'Beam - Size and Location',
         _getYesNo(formData['slab_item_11_yn']),
-        '',
+        '${formData['slab_item_11_remarks'] ?? ''}',
       ],
       <String>[
         'N',
         'Alignment of Beam Internal',
         _getYesNo(formData['slab_item_12_yn']),
-        '',
+        '${formData['slab_item_12_remarks'] ?? ''}',
       ],
       <String>[
         'O',
         'Electrical Sleeves',
         _getYesNo(formData['slab_item_13_yn']),
-        '',
+        '${formData['slab_item_13_remarks'] ?? ''}',
       ],
       <String>[
         'P',
         'Plumbing Sleeves',
         _getYesNo(formData['slab_item_14_yn']),
-        '',
+        '${formData['slab_item_14_remarks'] ?? ''}',
       ],
       <String>[
         'Q',
         'Hook Fan Location',
         _getYesNo(formData['slab_item_15_yn']),
-        '',
+        '${formData['slab_item_15_remarks'] ?? ''}',
       ],
       <String>[
         'R',
         'Chajja projection & alignment w.r.t slab',
         _getYesNo(formData['slab_item_16_yn']),
-        '',
+        '${formData['slab_item_16_remarks'] ?? ''}',
       ],
       <String>[
         'S',
         'Other slab projections',
         _getYesNo(formData['slab_item_17_yn']),
-        '',
+        '${formData['slab_item_17_remarks'] ?? ''}',
       ],
       <String>[''],
 
@@ -461,25 +467,25 @@ class PdfService {
         'A',
         'Width of Staircase',
         _getYesNo(formData['staircase_width_yn']),
-        '',
+        '${formData['staircase_width_remarks'] ?? ''}',
       ],
       <String>[
         'B',
         'Dimension of Risers, Treads',
         _getYesNo(formData['staircase_dimensions_yn']),
-        '',
+        '${formData['staircase_dimensions_remarks'] ?? ''}',
       ],
       <String>[
         'C',
         'Mid Landing Level of Staircase',
         _getYesNo(formData['mid_landing_level_yn']),
-        '',
+        '${formData['mid_landing_level_remarks'] ?? ''}',
       ],
       <String>[
         'D',
         'Hand Railing Details',
         _getYesNo(formData['hand_railing_yn']),
-        '',
+        '${formData['hand_railing_remarks'] ?? ''}',
       ],
       <String>[''],
 
@@ -489,7 +495,7 @@ class PdfService {
         'A',
         'Line & Level of Brickwork',
         _getYesNo(formData['brick_work_level_yn']),
-        '',
+        '${formData['brick_work_level_remarks'] ?? ''}',
       ],
       <String>[''],
 
@@ -499,16 +505,26 @@ class PdfService {
         'A',
         'South side',
         _getYesNo(formData['elevation_south_yn']),
-        '',
+        '${formData['elevation_south_remarks'] ?? ''}',
       ],
       <String>[
         'B',
         'North side',
         _getYesNo(formData['elevation_north_yn']),
-        '',
+        '${formData['elevation_north_remarks'] ?? ''}',
       ],
-      <String>['C', 'East side', _getYesNo(formData['elevation_east_yn']), ''],
-      <String>['D', 'West side', _getYesNo(formData['elevation_west_yn']), ''],
+      <String>[
+        'C',
+        'East side',
+        _getYesNo(formData['elevation_east_yn']),
+        '${formData['elevation_east_remarks'] ?? ''}',
+      ],
+      <String>[
+        'D',
+        'West side',
+        _getYesNo(formData['elevation_west_yn']),
+        '${formData['elevation_west_remarks'] ?? ''}',
+      ],
     ];
   }
 
