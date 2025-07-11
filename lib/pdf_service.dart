@@ -86,6 +86,76 @@ class PdfService {
       }
     }
 
+    final List<pw.TableRow> imageRows = [];
+
+    final elevationImageData = [
+      {'key': 'elevation_front', 'text': 'Front Elevation', 'index': 0},
+      {'key': 'elevation_rear', 'text': 'Rear Elevation', 'index': 1},
+      {'key': 'elevation_side1', 'text': 'Side 1 Elevation', 'index': 2},
+      {'key': 'elevation_side2', 'text': 'Side 2 Elevation', 'index': 3},
+    ];
+
+    for (final data in elevationImageData) {
+      final uiKey = data['key'] as String;
+      final index = data['index'] as int;
+      final text = data['text'] as String;
+      final descriptionKey = '${uiKey}_description';
+      final description = formData[descriptionKey] as String? ?? '';
+
+      if (elevImages.length > index && elevImages[index] != null) {
+        imageRows.add(
+          pw.TableRow(
+            children: [
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Image(
+                  elevImages[index]!,
+                  height: 250,
+                  fit: pw.BoxFit.contain,
+                ),
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  '$text: $description',
+                  style: const pw.TextStyle(fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+
+    for (var i = 0; i < imagesList.length; i++) {
+      if (imagesList[i] != null) {
+        final uiKey = 'other_image_${i + 1}';
+        final descriptionKey = '${uiKey}_description';
+        final description = formData[descriptionKey] as String? ?? '';
+        imageRows.add(
+          pw.TableRow(
+            children: [
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Image(
+                  imagesList[i]!,
+                  height: 250,
+                  fit: pw.BoxFit.contain,
+                ),
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  'Image ${i + 1}: $description',
+                  style: const pw.TextStyle(fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
@@ -182,43 +252,15 @@ class PdfService {
               data: _buildChecklistData(formData),
             ),
             pw.SizedBox(height: 5),
-            _buildElevationImage(
-              0,
-              elevImages,
-              formData,
-              'Front Elevation',
-              'elevation_front',
-            ),
-            _buildElevationImage(
-              1,
-              elevImages,
-              formData,
-              'Rear Elevation',
-              'elevation_rear',
-            ),
-            _buildElevationImage(
-              2,
-              elevImages,
-              formData,
-              'Side 1 Elevation',
-              'elevation_side1',
-            ),
-            _buildElevationImage(
-              3,
-              elevImages,
-              formData,
-              'Side 2 Elevation',
-              'elevation_side2',
-            ),
-            ...List.generate(
-              10,
-              (i) => _buildOtherImage(
-                i,
-                imagesList,
-                formData,
-                'other_image_${i + 1}',
+            if (imageRows.isNotEmpty)
+              pw.Table(
+                border: pw.TableBorder.all(),
+                columnWidths: const {
+                  0: pw.FlexColumnWidth(2),
+                  1: pw.FlexColumnWidth(1),
+                },
+                children: imageRows,
               ),
-            ),
           ];
         },
       ),
@@ -505,58 +547,5 @@ class PdfService {
         '${formData['elevation_west_remarks'] ?? ''}',
       ],
     ];
-  }
-
-  pw.Widget _buildElevationImage(
-    int index,
-    List<pw.ImageProvider?> elevImages,
-    Map<String, dynamic> formData,
-    String text,
-    String uiKey,
-  ) {
-    final descriptionKey = '${uiKey}_description';
-    final description = formData[descriptionKey] as String? ?? '';
-
-    if (elevImages[index] != null) {
-      return pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.center,
-        children: [
-          pw.Image(elevImages[index]!, height: 600, fit: pw.BoxFit.contain),
-          pw.SizedBox(height: 2),
-          pw.Text('$text: $description', style: pw.TextStyle(fontSize: 16)),
-          pw.SizedBox(height: 10),
-        ],
-      );
-    } else {
-      return pw.SizedBox(height: 0.1);
-    }
-  }
-
-  pw.Widget _buildOtherImage(
-    int index,
-    List<pw.ImageProvider?> imagesList,
-    Map<String, dynamic> formData,
-    String uiKey,
-  ) {
-    final descriptionKey = '${uiKey}_description';
-    final description = formData[descriptionKey] as String? ?? '';
-
-    if (imagesList[index] != null) {
-      return pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.center,
-        children: [
-          pw.SizedBox(height: 10),
-          pw.Image(imagesList[index]!, fit: pw.BoxFit.contain, height: 250),
-          pw.SizedBox(height: 2),
-          pw.Text(
-            'Image ${index + 1}: $description',
-            style: pw.TextStyle(fontSize: 12),
-          ),
-          pw.SizedBox(height: 2),
-        ],
-      );
-    } else {
-      return pw.SizedBox(height: 0.1);
-    }
   }
 }
