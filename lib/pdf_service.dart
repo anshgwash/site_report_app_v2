@@ -251,7 +251,7 @@ class PdfService {
               },
               data: _buildChecklistData(formData),
             ),
-            pw.SizedBox(height: 5),
+            pw.SizedBox(height: 50),
             if (imageRows.isNotEmpty)
               pw.Table(
                 border: pw.TableBorder.all(),

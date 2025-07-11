@@ -34,9 +34,9 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
-        maxWidth: 1800,
-        maxHeight: 1800,
-        imageQuality: 85,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 80,
       );
       if (image != null) {
         ref.read(formStateProvider.notifier).updateField(imageKey, image.path);
@@ -52,9 +52,9 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.camera,
-        maxWidth: 1800,
-        maxHeight: 1800,
-        imageQuality: 85,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 80,
       );
       if (image != null) {
         ref.read(formStateProvider.notifier).updateField(imageKey, image.path);
