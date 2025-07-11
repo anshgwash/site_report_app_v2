@@ -4,7 +4,6 @@ import 'form_tab.dart';
 import 'images_tab.dart';
 import 'pdf_service.dart';
 import 'providers/form_provider.dart';
-import 'package:open_file/open_file.dart';
 
 void main() {
   runApp(const ProviderScope(child: SiteReportApp()));
