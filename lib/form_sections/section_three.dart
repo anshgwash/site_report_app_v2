@@ -297,11 +297,11 @@ class _SectionThreeState extends State<SectionThree> {
                   });
                 },
                 icon: Icon(
-                  isRemarkExpanded ? Icons.remove : Icons.add,
+                  isRemarkExpanded ? Icons.expand_less : Icons.expand_more,
                   color: hasRemark ? Colors.orange : Colors.blue,
                   size: 20,
                 ),
-                tooltip: isRemarkExpanded ? 'Hide Remark' : 'Add Remark',
+                tooltip: isRemarkExpanded ? 'Collapse Remark' : 'Add Remark',
                 style: IconButton.styleFrom(
                   backgroundColor:
                       hasRemark ? Colors.orange.shade50 : Colors.blue.shade50,
