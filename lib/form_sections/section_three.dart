@@ -412,6 +412,7 @@ class _SectionThreeState extends State<SectionThree> {
       'Size of column',
       'Alignment of column',
       'Reduction of column',
+      'Termination of column',
       'Beam size and location',
       'Alignment of beam (internal, external, w.r.t slab level)',
       'Electrical sleeves',
