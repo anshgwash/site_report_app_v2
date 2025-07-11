@@ -27,12 +27,119 @@ class _SectionOneState extends State<SectionOne> {
   ];
 
   String? _selectedCheckType;
+  List<Map<String, dynamic>> _drawingNumbers = [];
+  final List<TextEditingController> _drawingNumberControllers = [];
+  final List<String> _drawingTypes = [
+    'Arch',
+    'Struct',
+    'Sect',
+    'Elev',
+    'Other',
+  ];
 
   @override
   void initState() {
     super.initState();
     // Initialize from existing data if available
     _selectedCheckType = widget.formData['typeOfCheck'] as String?;
+
+    // Initialize drawing numbers from form data
+    if (widget.formData.containsKey('drawingNumbers') &&
+        widget.formData['drawingNumbers'] is List) {
+      _drawingNumbers = List<Map<String, dynamic>>.from(
+        (widget.formData['drawingNumbers'] as List).map((item) {
+          String type = item['type'];
+          switch (type) {
+            case 'Architectural':
+              type = 'Arch';
+              break;
+            case 'Structural':
+              type = 'Struct';
+              break;
+            case 'Section':
+              type = 'Sect';
+              break;
+            case 'Elevation':
+              type = 'Elev';
+              break;
+          }
+          return {'type': type, 'number': item['number']};
+        }),
+      );
+    } else {
+      // Migrate from old data structure
+      _drawingNumbers = [];
+      final oldDwgFields = {
+        'architecturalDwgNo': 'Arch',
+        'structuralDwgNo': 'Struct',
+        'sectionDwgNo': 'Sect',
+        'elevationDwgNo': 'Elev',
+      };
+
+      oldDwgFields.forEach((key, type) {
+        if (widget.formData.containsKey(key) && widget.formData[key] != null) {
+          _drawingNumbers.add({
+            'type': type,
+            'number': widget.formData[key] as String,
+          });
+        }
+      });
+    }
+
+    // Create controllers and add listeners
+    for (var i = 0; i < _drawingNumbers.length; i++) {
+      var d = _drawingNumbers[i];
+      final controller = TextEditingController(text: d['number'] as String?);
+      controller.addListener(() {
+        _drawingNumbers[i]['number'] = controller.text;
+        _updateDrawingNumbersFormData();
+      });
+      _drawingNumberControllers.add(controller);
+    }
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _drawingNumberControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _updateDrawingNumbersFormData() {
+    final dataToStore =
+        _drawingNumbers
+            .map((d) => {'type': d['type'], 'number': d['number']})
+            .toList();
+    widget.updateFormData('drawingNumbers', dataToStore);
+  }
+
+  void _addDrawingNumber() {
+    setState(() {
+      final newDrawing = {'type': 'Arch', 'number': ''};
+      _drawingNumbers.add(newDrawing);
+
+      final controller = TextEditingController();
+      controller.addListener(() {
+        // Find index, in case other items were removed
+        final index = _drawingNumberControllers.indexOf(controller);
+        if (index != -1) {
+          _drawingNumbers[index]['number'] = controller.text;
+          _updateDrawingNumbersFormData();
+        }
+      });
+      _drawingNumberControllers.add(controller);
+    });
+    _updateDrawingNumbersFormData();
+  }
+
+  void _removeDrawingNumber(int index) {
+    setState(() {
+      _drawingNumberControllers[index].dispose();
+      _drawingNumberControllers.removeAt(index);
+      _drawingNumbers.removeAt(index);
+    });
+    _updateDrawingNumbersFormData();
   }
 
   @override
@@ -101,6 +208,108 @@ class _SectionOneState extends State<SectionOne> {
     );
   }
 
+  Widget _buildDrawingNumbersFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Drawing Numbers',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 12),
+        ..._buildDrawingNumberInputs(),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: ElevatedButton.icon(
+            onPressed: _addDrawingNumber,
+            icon: const Icon(Icons.add),
+            label: const Text('Add Dwgs'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[50],
+              foregroundColor: Colors.green[800],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildDrawingNumberInputs() {
+    if (_drawingNumbers.isEmpty) {
+      return [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0),
+          child: Center(
+            child: Text(
+              'No drawing numbers added.\nUse the button to add one.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ];
+    }
+
+    List<Widget> fields = [];
+    for (int i = 0; i < _drawingNumbers.length; i++) {
+      fields.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 3,
+                child: DropdownButtonFormField<String>(
+                  value: _drawingNumbers[i]['type'] as String,
+                  items:
+                      _drawingTypes.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value, overflow: TextOverflow.ellipsis),
+                        );
+                      }).toList(),
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _drawingNumbers[i]['type'] = newValue;
+                      });
+                      _updateDrawingNumbersFormData();
+                    }
+                  },
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 15,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 5,
+                child: TextFormField(
+                  controller: _drawingNumberControllers[i],
+                  decoration: const InputDecoration(
+                    labelText: 'Dwg No.',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.remove_circle_outline, color: Colors.red[700]),
+                onPressed: () => _removeDrawingNumber(i),
+                tooltip: 'Remove Drawing Number',
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    return fields;
+  }
+
   Widget _buildTypeOfCheckChips() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,63 +332,6 @@ class _SectionOneState extends State<SectionOne> {
                   },
                 );
               }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDrawingNumbersFields() {
-    return Column(
-      children: [
-        TextFormField(
-          initialValue: widget.formData['architecturalDwgNo'] as String?,
-          decoration: const InputDecoration(
-            labelText: 'Architectural Dwg No.',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.architecture),
-          ),
-          onChanged: (value) {
-            widget.updateFormData('architecturalDwgNo', value);
-          },
-        ),
-        const SizedBox(height: 12),
-
-        TextFormField(
-          initialValue: widget.formData['structuralDwgNo'] as String?,
-          decoration: const InputDecoration(
-            labelText: 'Structural Dwg No.',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.domain),
-          ),
-          onChanged: (value) {
-            widget.updateFormData('structuralDwgNo', value);
-          },
-        ),
-        const SizedBox(height: 12),
-
-        TextFormField(
-          initialValue: widget.formData['sectionDwgNo'] as String?,
-          decoration: const InputDecoration(
-            labelText: 'Section Dwg No.',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.splitscreen),
-          ),
-          onChanged: (value) {
-            widget.updateFormData('sectionDwgNo', value);
-          },
-        ),
-        const SizedBox(height: 12),
-
-        TextFormField(
-          initialValue: widget.formData['elevationDwgNo'] as String?,
-          decoration: const InputDecoration(
-            labelText: 'Elevation Dwg No.',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.layers),
-          ),
-          onChanged: (value) {
-            widget.updateFormData('elevationDwgNo', value);
-          },
         ),
       ],
     );

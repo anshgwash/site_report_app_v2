@@ -168,6 +168,21 @@ class _SectionThreeState extends State<SectionThree> {
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            _buildSectionHeader('Additional Remarks'),
+            const SizedBox(height: 16),
+            TextFormField(
+              initialValue: widget.formData['additional_remarks'] as String?,
+              decoration: const InputDecoration(
+                labelText: 'Additional Remarks',
+                hintText: 'Enter any additional remarks here...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 5,
+              onChanged: (value) {
+                widget.updateFormData('additional_remarks', value);
+              },
+            ),
           ],
         ),
       ),

@@ -184,36 +184,7 @@ class PdfService {
             ),
             pw.Table.fromTextArray(
               context: context,
-              data: <List<String>>[
-                <String>['Category', 'Value'],
-                <String>['Subject:', '${formData['typeOfCheck'] ?? 'N/A'}'],
-                <String>[
-                  'Arch Dwg No.:',
-                  '${formData['architecturalDwgNo'] ?? 'N/A'}',
-                ],
-                <String>[
-                  'Structural Dwg No.:',
-                  '${formData['structuralDwgNo'] ?? 'N/A'}',
-                ],
-                <String>[
-                  'Section Dwg No.:',
-                  '${formData['sectionDwgNo'] ?? 'N/A'}',
-                ],
-                <String>[
-                  'Elevation Dwg No.:',
-                  '${formData['elevationDwgNo'] ?? 'N/A'}',
-                ],
-                <String>['Slab Level:', '${formData['slabLevel'] ?? 'N/A'}'],
-                <String>['Date:', '${DateTime.now().toString().split(' ')[0]}'],
-                <String>[
-                  'Time:',
-                  '${DateTime.now().toString().split(' ')[1].substring(0, 5)}',
-                ],
-                <String>[
-                  'Site Report No.:',
-                  '${formData['siteReportNo'] ?? 'N/A'}',
-                ],
-              ],
+              data: _buildSiteInfoTable(formData),
             ),
             pw.SizedBox(height: 10),
             pw.Table.fromTextArray(
@@ -251,6 +222,32 @@ class PdfService {
               },
               data: _buildChecklistData(formData),
             ),
+            if (formData['additional_remarks'] != null &&
+                formData['additional_remarks'].toString().trim().isNotEmpty)
+              pw.Container(
+                margin: const pw.EdgeInsets.only(top: 20),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Header(level: 2, text: 'Additional Remarks'),
+                    pw.Table(
+                      border: pw.TableBorder.all(),
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(10),
+                              child: pw.Text(
+                                formData['additional_remarks'].toString(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             pw.SizedBox(height: 50),
             if (imageRows.isNotEmpty)
               pw.Table(
@@ -286,6 +283,60 @@ class PdfService {
       print('Error saving or sharing PDF: $e');
       rethrow;
     }
+  }
+
+  List<List<String>> _buildSiteInfoTable(Map<String, dynamic> formData) {
+    final List<List<String>> siteInfoData = [
+      ['Category', 'Value'],
+      ['Subject:', '${formData['typeOfCheck'] ?? 'N/A'}'],
+    ];
+
+    if (formData.containsKey('drawingNumbers') &&
+        formData['drawingNumbers'] is List &&
+        (formData['drawingNumbers'] as List).isNotEmpty) {
+      final drawingNumbers = formData['drawingNumbers'] as List;
+      for (var dwg in drawingNumbers) {
+        if (dwg is Map) {
+          final type = dwg['type'] ?? 'Dwg';
+          final number = dwg['number'] ?? 'N/A';
+          if (number.toString().isNotEmpty) {
+            siteInfoData.add(['$type Dwg No.:', number.toString()]);
+          }
+        }
+      }
+    } else {
+      // Legacy support
+      if (formData['architecturalDwgNo'] != null) {
+        siteInfoData.add([
+          'Arch Dwg No.:',
+          '${formData['architecturalDwgNo']}',
+        ]);
+      }
+      if (formData['structuralDwgNo'] != null) {
+        siteInfoData.add([
+          'Structural Dwg No.:',
+          '${formData['structuralDwgNo']}',
+        ]);
+      }
+      if (formData['sectionDwgNo'] != null) {
+        siteInfoData.add(['Section Dwg No.:', '${formData['sectionDwgNo']}']);
+      }
+      if (formData['elevationDwgNo'] != null) {
+        siteInfoData.add([
+          'Elevation Dwg No.:',
+          '${formData['elevationDwgNo']}',
+        ]);
+      }
+    }
+
+    siteInfoData.addAll([
+      ['Slab Level:', '${formData['slabLevel'] ?? 'N/A'}'],
+      ['Date:', '${DateTime.now().toString().split(' ')[0]}'],
+      ['Time:', '${DateTime.now().toString().split(' ')[1].substring(0, 5)}'],
+      ['Site Report No.:', '${formData['siteReportNo'] ?? 'N/A'}'],
+    ]);
+
+    return siteInfoData;
   }
 
   String _getYesNo(dynamic value) {
