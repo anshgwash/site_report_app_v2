@@ -25,17 +25,14 @@ class _SectionOneState extends State<SectionOne> {
     'Slab',
     'Brick Work',
   ];
-  final List<String> _reportByOptions = ['Ansh G', 'Sundeep G', 'Vishal S'];
 
   String? _selectedCheckType;
-  String? _selectedReportBy;
 
   @override
   void initState() {
     super.initState();
     // Initialize from existing data if available
     _selectedCheckType = widget.formData['typeOfCheck'] as String?;
-    _selectedReportBy = widget.formData['reportBy'] as String?;
   }
 
   @override
@@ -66,8 +63,6 @@ class _SectionOneState extends State<SectionOne> {
 
             _buildSiteReportNumberField(),
             const SizedBox(height: 16),
-
-            // _buildReportByChips(),
           ],
         ),
       ),
@@ -248,31 +243,4 @@ class _SectionOneState extends State<SectionOne> {
       },
     );
   }
-
-  // Widget _buildReportByChips() {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       const Text('Report By:'),
-  //       const SizedBox(height: 8),
-  //       Wrap(
-  //         spacing: 8,
-  //         children:
-  //             _reportByOptions.map((person) {
-  //               return ChoiceChip(
-  //                 label: Text(person),
-  //                 selected: _selectedReportBy == person,
-  //                 selectedColor: Colors.blue.shade100,
-  //                 onSelected: (selected) {
-  //                   setState(() {
-  //                     _selectedReportBy = selected ? person : null;
-  //                     widget.updateFormData('reportBy', _selectedReportBy);
-  //                   });
-  //                 },
-  //               );
-  //             }).toList(),
-  //       ),
-  //     ],
-  //   );
-  // }
 }
