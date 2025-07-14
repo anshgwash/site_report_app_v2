@@ -37,11 +37,14 @@ class _SectionOneState extends State<SectionOne> {
     'Other',
   ];
 
+  DateTime? _selectedDate;
+
   @override
   void initState() {
     super.initState();
     // Initialize from existing data if available
     _selectedCheckType = widget.formData['typeOfCheck'] as String?;
+    _selectedDate = widget.formData['date'] as DateTime?;
 
     // Initialize drawing numbers from form data
     if (widget.formData.containsKey('drawingNumbers') &&
@@ -170,6 +173,8 @@ class _SectionOneState extends State<SectionOne> {
 
             _buildSiteReportNumberField(),
             const SizedBox(height: 16),
+
+            _buildDateTimeField(),
           ],
         ),
       ),
@@ -394,5 +399,41 @@ class _SectionOneState extends State<SectionOne> {
         );
       },
     );
+  }
+
+  Widget _buildDateTimeField() {
+    final dateText =
+        _selectedDate == null
+            ? ''
+            : '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}';
+
+    return TextFormField(
+      readOnly: true,
+      controller: TextEditingController(text: dateText),
+      decoration: const InputDecoration(
+        labelText: 'Date',
+        border: OutlineInputBorder(),
+        prefixIcon: Icon(Icons.calendar_today),
+      ),
+      onTap: _pickDateTime,
+    );
+  }
+
+  Future<void> _pickDateTime() async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate == null) return;
+
+    if (!mounted) return;
+
+    setState(() {
+      _selectedDate = pickedDate;
+      widget.updateFormData('date', _selectedDate);
+    });
   }
 }

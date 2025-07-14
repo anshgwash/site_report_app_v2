@@ -334,10 +334,18 @@ class PdfService {
       }
     }
 
+    final String dateString;
+    if (formData['date'] != null && formData['date'] is DateTime) {
+      final DateTime date = formData['date'] as DateTime;
+      dateString =
+          '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    } else {
+      dateString = 'N/A';
+    }
+
     siteInfoData.addAll([
       ['Slab Level:', '${formData['slabLevel'] ?? 'N/A'}'],
-      ['Date:', '${DateTime.now().toString().split(' ')[0]}'],
-      ['Time:', '${DateTime.now().toString().split(' ')[1].substring(0, 5)}'],
+      ['Date:', dateString],
       ['Site Report No.:', '${formData['siteReportNo'] ?? 'N/A'}'],
     ]);
 
