@@ -146,7 +146,7 @@ class PdfService {
               pw.Padding(
                 padding: const pw.EdgeInsets.all(5),
                 child: pw.Text(
-                  'Image ${i + 1}: $description',
+                  description,
                   style: const pw.TextStyle(fontSize: 12),
                 ),
               ),
@@ -167,18 +167,20 @@ class PdfService {
               child: pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
-                  pw.Text(
-                    '${formData['projectName'] ?? 'Project'}',
-                    style: pw.TextStyle(fontSize: 20),
+                  pw.Flexible(
+                    child: pw.Text(
+                      '${formData['projectName'] ?? 'Project'}',
+                      style: pw.TextStyle(fontSize: 20),
+                    ),
                   ),
                   logoImage != null
                       ? pw.Image(
                         logoImage,
                         fit: pw.BoxFit.contain,
-                        height: 74.3,
-                        width: 60,
+                        height: 99.067,
+                        width: 80,
                       )
-                      : pw.SizedBox(height: 74.3, width: 60),
+                      : pw.SizedBox(height: 99.067, width: 80),
                 ],
               ),
             ),
