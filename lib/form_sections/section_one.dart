@@ -44,7 +44,14 @@ class _SectionOneState extends State<SectionOne> {
     super.initState();
     // Initialize from existing data if available
     _selectedCheckType = widget.formData['typeOfCheck'] as String?;
-    _selectedDate = widget.formData['date'] as DateTime?;
+    final dynamic dateValue = widget.formData['date'];
+    if (dateValue is String) {
+      _selectedDate = DateTime.tryParse(dateValue);
+    } else if (dateValue is DateTime) {
+      _selectedDate = dateValue;
+    } else {
+      _selectedDate = null;
+    }
 
     // Initialize drawing numbers from form data
     if (widget.formData.containsKey('drawingNumbers') &&
@@ -433,7 +440,7 @@ class _SectionOneState extends State<SectionOne> {
 
     setState(() {
       _selectedDate = pickedDate;
-      widget.updateFormData('date', _selectedDate);
+      widget.updateFormData('date', _selectedDate?.toIso8601String());
     });
   }
 }

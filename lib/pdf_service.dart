@@ -335,8 +335,15 @@ class PdfService {
     }
 
     final String dateString;
-    if (formData['date'] != null && formData['date'] is DateTime) {
-      final DateTime date = formData['date'] as DateTime;
+    final dateValue = formData['date'];
+    DateTime? date;
+    if (dateValue is String) {
+      date = DateTime.tryParse(dateValue);
+    } else if (dateValue is DateTime) {
+      date = dateValue;
+    }
+
+    if (date != null) {
       dateString =
           '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
     } else {
