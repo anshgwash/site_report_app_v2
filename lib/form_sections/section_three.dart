@@ -383,33 +383,120 @@ class _SectionThreeState extends State<SectionThree> {
   }
 
   Widget _buildSlabLevelField() {
+    const fieldName = 'level_of_slab';
+    final hasRemark =
+        widget.formData['${fieldName}_remarks'] != null &&
+        widget.formData['${fieldName}_remarks'].toString().isNotEmpty;
+    final isRemarkExpanded = _expandedRemarks[fieldName] ?? false;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        initialValue: widget.formData['level_of_slab']?.toString(),
-        decoration: const InputDecoration(
-          labelText: 'Level of slab',
-          border: OutlineInputBorder(),
-          prefixIcon: Icon(Icons.height),
-          hintText: 'Enter a value between 1-100',
-        ),
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        validator: (value) {
-          if (value != null && value.isNotEmpty) {
-            int? level = int.tryParse(value);
-            if (level == null || level < 1 || level > 100) {
-              return 'Level must be between 1 and 100';
-            }
-          }
-          return null;
-        },
-        onChanged: (value) {
-          widget.updateFormData(
-            'level_of_slab',
-            value.isEmpty ? null : int.tryParse(value),
-          );
-        },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextFormField(
+                  initialValue: widget.formData['level_of_slab']?.toString(),
+                  decoration: const InputDecoration(
+                    labelText: 'Level of slab',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.height),
+                    hintText: 'Enter a value between 1-100',
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      int? level = int.tryParse(value);
+                      if (level == null || level < 1 || level > 100) {
+                        return 'Level must be between 1 and 100';
+                      }
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    widget.updateFormData(
+                      'level_of_slab',
+                      value.isEmpty ? null : int.tryParse(value),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _expandedRemarks[fieldName] = !isRemarkExpanded;
+                  });
+                },
+                icon: Icon(
+                  isRemarkExpanded ? Icons.expand_less : Icons.expand_more,
+                  color: hasRemark ? Colors.orange : Colors.blue,
+                  size: 20,
+                ),
+                tooltip: isRemarkExpanded ? 'Collapse Remark' : 'Add Remark',
+                style: IconButton.styleFrom(
+                  backgroundColor:
+                      hasRemark ? Colors.orange.shade50 : Colors.blue.shade50,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (isRemarkExpanded) ...[
+            const SizedBox(height: 8),
+            TextFormField(
+              initialValue: widget.formData['${fieldName}_remarks'] as String?,
+              decoration: const InputDecoration(
+                labelText: 'Remarks',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                hintText: 'Enter your remarks here...',
+              ),
+              maxLines: 3,
+              maxLength: 240,
+              onChanged: (value) {
+                widget.updateFormData('${fieldName}_remarks', value);
+              },
+            ),
+          ],
+          if (!isRemarkExpanded && hasRemark) ...[
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: Colors.orange.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.note, size: 16, color: Colors.orange.shade700),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.formData['${fieldName}_remarks'].toString(),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange.shade700,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }

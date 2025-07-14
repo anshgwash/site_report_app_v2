@@ -420,7 +420,7 @@ class PdfService {
         '(a)',
         'Level Of Slab',
         '${formData['level_of_slab'] ?? 'N/A'}',
-        '',
+        '${formData['level_of_slab_remarks'] ?? ''}',
       ],
       <String>[
         '(b)',
