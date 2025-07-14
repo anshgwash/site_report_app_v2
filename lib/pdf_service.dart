@@ -23,7 +23,7 @@ class PdfService {
 
     pw.ImageProvider? logoImage;
     try {
-      final logoBytes = await rootBundle.load('logo.png');
+      final logoBytes = await rootBundle.load('logo2.png');
       logoImage = pw.MemoryImage(logoBytes.buffer.asUint8List());
     } catch (e) {
       print('Logo image not found: $e');
@@ -220,10 +220,10 @@ class PdfService {
               context: context,
               border: pw.TableBorder.all(color: PdfColors.grey),
               columnWidths: {
-                0: pw.FractionColumnWidth(0.05),
+                0: pw.FractionColumnWidth(0.07),
                 1: pw.FractionColumnWidth(0.5),
                 2: pw.FractionColumnWidth(0.05),
-                3: pw.FractionColumnWidth(0.4),
+                3: pw.FractionColumnWidth(0.38),
               },
               data: _buildChecklistData(formData),
             ),
