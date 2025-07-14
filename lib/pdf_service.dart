@@ -185,10 +185,12 @@ class PdfService {
             pw.Table.fromTextArray(
               context: context,
               data: _buildSiteInfoTable(formData),
+              border: pw.TableBorder.all(color: PdfColors.grey),
             ),
             pw.SizedBox(height: 10),
             pw.Table.fromTextArray(
               context: context,
+              border: pw.TableBorder.all(color: PdfColors.grey),
               data: <List<String>>[
                 <String>['Representing', 'Name and designation'],
                 <String>[
@@ -214,6 +216,7 @@ class PdfService {
             ),
             pw.Table.fromTextArray(
               context: context,
+              border: pw.TableBorder.all(color: PdfColors.grey),
               columnWidths: {
                 0: pw.FractionColumnWidth(0.05),
                 1: pw.FractionColumnWidth(0.5),
@@ -231,7 +234,7 @@ class PdfService {
                   children: [
                     pw.Header(level: 2, text: 'Additional Remarks'),
                     pw.Table(
-                      border: pw.TableBorder.all(),
+                      border: pw.TableBorder.all(color: PdfColors.grey),
                       children: [
                         pw.TableRow(
                           children: [
@@ -251,7 +254,7 @@ class PdfService {
             pw.SizedBox(height: 50),
             if (imageRows.isNotEmpty)
               pw.Table(
-                border: pw.TableBorder.all(),
+                border: pw.TableBorder.all(color: PdfColors.grey),
                 columnWidths: const {
                   0: pw.FlexColumnWidth(2),
                   1: pw.FlexColumnWidth(1),
