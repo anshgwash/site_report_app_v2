@@ -23,7 +23,7 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
   ];
 
   final List<Map<String, dynamic>> otherImages = List.generate(
-    10,
+    30,
     (index) => {
       'label': 'Image ${index + 1}',
       'key': 'other_image_${index + 1}',
@@ -34,9 +34,9 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
-        maxWidth: 1200,
-        maxHeight: 1200,
-        imageQuality: 80,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 50,
       );
       if (image != null) {
         ref.read(formStateProvider.notifier).updateField(imageKey, image.path);
@@ -52,9 +52,9 @@ class _ImagesTabState extends ConsumerState<ImagesTab> {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.camera,
-        maxWidth: 1200,
-        maxHeight: 1200,
-        imageQuality: 80,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 50,
       );
       if (image != null) {
         ref.read(formStateProvider.notifier).updateField(imageKey, image.path);
